@@ -72,4 +72,6 @@ onMounted(() => {
 .p-tabview-panels {
   margin-top: 20px;
 }
+
+
 </style>

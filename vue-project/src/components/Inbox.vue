@@ -79,13 +79,16 @@
   <!-- Dialog do tworzenia nowego maila -->
   <Dialog header="New Message" v-model:visible="isDialogVisible" :modal="true" :closable="false" class="p-fluid" style="width: 80vw; height: 80vh;">
     <div>
-      <InputText v-model="newMessage.subject" placeholder="Subject" class="p-inputtext p-component p-fluid" style="width: 100%;" />
-    </div>
-    <div class="p-mt-3">
       <InputText v-model="newMessage.recipient" placeholder="Recipient" class="p-inputtext p-component p-fluid" style="width: 100%;" />
     </div>
     <div class="p-mt-3">
-      <Editor v-model="newMessage.body" placeholder="Write your message..." style="min-height: 300px; width: 100%;" />
+      <InputText v-model="newMessage.subject" placeholder="Subject" class="p-inputtext p-component p-fluid" style="width: 100%;" />
+
+    </div>
+    <div class="p-mt-3">
+      
+      <Editor v-model="newMessage.body" placeholder="Write your message..." style="height: 600px; width: 100%;" />
+
     </div>
 
     <div class="p-d-flex p-jc-end p-mt-4">
@@ -205,7 +208,7 @@ const sendNewMessage = async () => {
   // Przygotowanie danych do wysyłki
   const messageData = {
     recipient: newMessage.value.recipient,
-    topic: newMessage.value.subject,
+    subject: newMessage.value.subject,
     body: newMessage.value.body,
   };
 
