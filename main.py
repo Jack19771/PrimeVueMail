@@ -3,14 +3,22 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from Crypto.PublicKey import RSA
 import os
-from pydantic import BaseModel
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.Signature import pkcs1_15
 from Crypto.Hash import SHA256
 import json
+import base64
+import subprocess
+from kademlia.network import Server
 
 
 app = FastAPI()
+
+
+
+
+
+
 
 # Dodanie CORS middleware
 app.add_middleware(
@@ -89,11 +97,17 @@ def save_message_to_file(message_data, filename):
         json.dump(message_data, f, indent=4)
     print(f"Message saved to {filename}")
 
+# Funkcja do szyfrowania wiadomości
 def encrypt_message(message, public_key):
     cipher_rsa = PKCS1_OAEP.new(RSA.import_key(public_key))
     encrypted_message = cipher_rsa.encrypt(message.encode('utf-8'))
-    return encrypted_message
+    
+    # Kodowanie zaszyfrowanej wiadomości w Base64
+    encrypted_message_base64 = base64.b64encode(encrypted_message).decode('utf-8')
+    
+    return encrypted_message_base64
 
+# Funkcja do podpisywania wiadomości
 def sign_message(message, private_key):
     private_key = RSA.import_key(private_key)
     h = SHA256.new(message.encode('utf-8'))
@@ -117,10 +131,11 @@ async def send_mail(email: EmailMessage):
         with open('keys/public_key.pem', 'rb') as pub_file:
             public_key = pub_file.read()
         encrypted_message = encrypt_message(email.body, public_key)
-        encrypted_filename = f"messages/encrypted_{email.subject.replace(' ', '_')}_{email.recipient}.bin"
-        with open(encrypted_filename, 'wb') as enc_file:
-            enc_file.write(encrypted_message)  # Zapisanie zaszyfrowanej wiadomości
-
+        encrypted_filename = f"messages/encrypted_{email.subject.replace(' ', '_')}_{email.recipient}.txt"  # Używamy .txt dla ASCII
+        with open(encrypted_filename, 'w') as enc_file:
+            enc_file.write(encrypted_message)  # Zapisujemy zaszyfrowaną wiadomość w Base64 jako tekst
+            call_set_script('51.12.244.193', 8468, 'email', 'Jacek')
+            #
         # Wczytanie klucza prywatnego i podpisywanie wiadomości
         with open('keys/private_key.pem', 'rb') as priv_file:
             private_key = priv_file.read()
@@ -132,5 +147,3 @@ async def send_mail(email: EmailMessage):
         return {"message": "Email processed successfully"}
     except Exception as e:
         return {"error": str(e)}
-
-

@@ -10,7 +10,7 @@ import 'primeicons/primeicons.css'
 import Editor from 'primevue/editor';
 import ToastService from 'primevue/toastservice';
 import Checkbox from 'primevue/checkbox';
-
+import router from './router'; // Musi być poprawnie zaimportowany router
 import App from './App.vue'
 
 const app = createApp(App);
@@ -20,7 +20,7 @@ app.use(PrimeVue, {
          },
 });
 app.use(ToastService); // Dodanie ToastService
-
+app.use(router);
 export default {
    components: {
      Checkbox
@@ -28,3 +28,5 @@ export default {
  };
 
 app.mount('#app')
+
+
