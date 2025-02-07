@@ -11,6 +11,7 @@ import TabPanel from 'primevue/tabpanel';  // Zaimportuj TabPanel
 import Loader from '../components/Loader.vue';  // Zaimportuj komponent Loader
 import Toast from 'primevue/toast';
 import Account from '../components/Account.vue';  // Zaimportuj komponent Account
+import Documentlibrary from '../components/Documentlibrary.vue';  // Zaimportuj komponent Documentlibrary
 
 
 
@@ -46,7 +47,11 @@ onMounted(() => {
           <Account />
         </TabPanel>
         <TabPanel header="Drafted">
+        </TabPanel>
+        <TabPanel header="Documents">
+          <Documentlibrary />
           <Drafts />
+          
         </TabPanel>
       </TabView>
     </div>

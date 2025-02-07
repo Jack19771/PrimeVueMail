@@ -69,5 +69,7 @@ onMounted(() => {
   right: 0;
   z-index: 1000;
   font-weight: bold;
+  font-size: 1,5rem !important; /* Dodanie !important */
+  
 }
 </style>

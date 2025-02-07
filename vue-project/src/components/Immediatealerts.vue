@@ -11,7 +11,7 @@
         Select an alert from the dropdown and activate it to notify all users.
       </p>
 
-      <div class="flex gap-4 items-center mb-4">
+      <div class="flex gap-8 items-center mb-8">
         <Dropdown 
           v-model="selectedAlert" 
           :options="alertOptions" 
@@ -23,14 +23,14 @@
         <Button 
           label="Activate" 
           icon="pi pi-check" 
-          class="p-button-success" 
+          class="p-button-danger" 
           @click="activateAlert"
         />
 
         <Button 
           label="Deactivate" 
           icon="pi pi-times" 
-          class="p-button-danger" 
+          class="p-button-success" 
           @click="deactivateAlert"
         />
       </div>
@@ -76,7 +76,7 @@ export default {
 
       const alertLabel = selectedAlert.value.label || selectedAlert.value; // Use 'label' if the object is selected
 
-      fetch('http://localhost:8000/send-alert', {
+      fetch('http://192.168.178.73:8000/send-alert', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ alert: alertLabel }),
@@ -87,7 +87,7 @@ export default {
     };
 
     const deactivateAlert = () => {
-      fetch('http://localhost:8000/send-alert', {
+      fetch('http://192.168.178.73:8000/send-alert', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ alert: null }),
@@ -106,7 +106,7 @@ export default {
     };
 
     const setupWebSocket = () => {
-      socket = new WebSocket('ws://localhost:8000/ws');
+      socket = new WebSocket('ws://192.168.178.73:8000/ws');
       socket.onopen = () => console.log('WebSocket connected');
       socket.onmessage = handleIncomingMessage;
       socket.onclose = () => console.log('WebSocket disconnected');
@@ -129,11 +129,13 @@ export default {
 </script>
 
 <style scoped>
-.alert-banner {
-  background-color: red;
-  color: white;
-  text-align: center;
-  padding: 1rem;
-  font-weight: bold;
+
+
+.p-button-danger {
+  margin: 10px;
+}
+
+.p-select {
+  width: 70%;
 }
 </style>

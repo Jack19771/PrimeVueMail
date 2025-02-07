@@ -35,7 +35,7 @@
   import Checkbox from 'primevue/checkbox';
   
   // WebSocket
-  const socket = new WebSocket('ws://localhost:8000/ws');  // Upewnij się, że adres i port są poprawne
+  const socket = new WebSocket('ws://192.168.178.73:8000/ws');  // Upewnij się, że adres i port są poprawne
   
   // Message data
   const messages = ref([]);
