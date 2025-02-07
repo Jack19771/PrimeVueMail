@@ -14,7 +14,7 @@ import Account from '../components/Account.vue';  // Zaimportuj komponent Accoun
 import Zeroconf from '../components/Zeroconf.vue';  // Zaimportuj komponent Zeroconf
 import Fieldset from 'primevue/fieldset';
 import Panel from 'primevue/panel';
-
+import Immediatealerts from '../components/Immediatealerts.vue';  // Zaimportuj komponent Immediatealerts
 
 // Stan ładowania
 const isLoading = ref(true);
@@ -50,6 +50,9 @@ onMounted(() => {
                 <TabPanel header="User Management">
 
                 </TabPanel>
+                <TabPanel header="Immediate Alerts">
+                    <immediatealerts />
+            </TabPanel>
             </TabView>
         </div>
     </div>

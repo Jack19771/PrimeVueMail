@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from Crypto.PublicKey import RSA
@@ -10,15 +10,69 @@ import json
 import base64
 import subprocess
 from kademlia.network import Server
-
+import asyncio
 
 app = FastAPI()
 
+# Lista aktywnych połączeń WebSocket
+active_connections = []
+# Globalny stan alertu
+alert_state = {"alert": None}
 
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    try:
+        await websocket.accept()
+        print("WebSocket connection accepted")  # Logowanie po otwarciu połączenia
+        active_connections.append(websocket)
+        
+        while True:
+            message = await websocket.receive_text()
+            print(f"Received message: {message}")  # Logowanie odebranej wiadomości
+            
+            # Wysyłamy wiadomość do innych połączeń WebSocket
+            for connection in active_connections:
+                if connection != websocket:
+                    await connection.send_text(message)
+    except WebSocketDisconnect:
+        print("WebSocket disconnected")  # Logowanie przy rozłączeniu
+        active_connections.remove(websocket)
 
+@app.post("/send-alert")
+async def send_alert(alert: dict):
+    # Zapisz status alertu do bazy danych, pliku, lub w pamięci
+    alert_status = alert.get("alert", False)
+    alert_state["alert"] = alert_status  # Uaktualniamy stan alertu
+    
+    # Powiadom wszystkich połączonych klientów
+    await notify_clients()
+    
+    return {"message": f"Alert status: {alert_status}"}
 
+async def notify_clients():
+    # Przesyłanie danych alertu do wszystkich połączonych klientów za pomocą SSE
+    for connection in active_connections:
+        try:
+            # Wysłanie alertu do połączonych klientów
+            if alert_state["alert"]:
+                await connection.send_text(f"Alert: {alert_state['alert']}")
+            else:
+                await connection.send_text("Alert deactivated")
+        except WebSocketDisconnect:
+            active_connections.remove(connection)
 
+@app.get("/get-alert-status")
+async def get_alert_status():
+    # Zwróć aktualny status alertu
+    return {"alert": alert_state["alert"]}
 
+def call_set_script(bootstrap_node, bootstrap_port, key, value):
+    # Używamy subprocess do wywołania set.py z odpowiednimi argumentami
+    try:
+        subprocess.run(['python', 'set.py', bootstrap_node, str(bootstrap_port), key, value], check=True)
+        print("Dane zostały pomyślnie wstawione do Kademlia.")
+    except subprocess.CalledProcessError as e:
+        print(f"Błąd podczas wywoływania set.py: {e}")
 
 # Dodanie CORS middleware
 app.add_middleware(
@@ -81,8 +135,6 @@ async def generate_pgp_keys(request: PGPRequest):
 
     except Exception as e:
         return {"error": str(e)}
-
-
 
 os.makedirs('messages', exist_ok=True)
 os.makedirs('keys', exist_ok=True)

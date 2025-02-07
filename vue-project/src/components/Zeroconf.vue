@@ -3,7 +3,7 @@
         <div class="card">
             <h3>Connection Configuration</h3>
             <p>Connection is a crucial thing that ensures proper operation.</p>
-            
+
             <hr />
             <br />
             <!-- Radio Buttons for Connection Methods -->
@@ -50,10 +50,26 @@
             </div>
         </div>
     </Fieldset>
+
+
+
+    <Card>
+        <template #title>Simple Card</template>
+        <template #content>
+            <p class="m-0">
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed consequuntur error repudiandae
+                numquam deserunt quisquam repellat libero asperiores earum nam nobis, culpa ratione quam perferendis
+                esse, cupiditate neque
+                quas!
+            </p>
+        </template>
+    </Card>
+
 </template>
 
 <script setup>
 import { ref } from 'vue';
+import card from 'primevue/card';
 import { RadioButton, Button, InputText } from 'primevue';
 import Fieldset from 'primevue/fieldset';
 const connectionMethod = ref(null);
