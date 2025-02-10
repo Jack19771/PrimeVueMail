@@ -50,7 +50,7 @@ onMounted(() => {
         </TabPanel>
         <TabPanel header="Documents">
           <Documentlibrary />
-          <Drafts />
+          
           
         </TabPanel>
       </TabView>

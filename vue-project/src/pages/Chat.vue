@@ -1,5 +1,5 @@
 <template>
-    <div class="content">
+    <div class="dupa">
       <Card>
         <template #title>Real-Time Chat</template>
         <template #content>
@@ -61,7 +61,7 @@
     if (newMessage.value.trim()) {
       const message = {
         text: newMessage.value,
-        author: 'Ty',  // Ustawiamy na "Ty" jeśli to nasza wiadomość
+        author: 'Ty ',  // Ustawiamy na "Ty" jeśli to nasza wiadomość
         timestamp: getCurrentTimestamp(),
         isSent: true,
         isImportant: isImportant.value,
@@ -79,7 +79,7 @@
     if (typeof event.data === 'string') {
       const message = {
         text: event.data,
-        author: 'Partner',  // Przypisujemy "Partner" dla wiadomości przychodzących
+        author: 'Partner ',  // Przypisujemy "Partner" dla wiadomości przychodzących
         timestamp: getCurrentTimestamp(),
         isSent: false,
         isImportant: false,  // Zakładając, że wiadomości przychodzące nie są oznaczone jako IMPORTANT
@@ -107,13 +107,13 @@
   </script>
   
   <style scoped>
-  .content {
-    margin-top: 80px;
+  .dupa {
+    
     padding: 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: calc(100vh - 100px);
+    height: calc(100vh - 150px);
   }
   
   .message-list {

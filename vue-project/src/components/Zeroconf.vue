@@ -1,10 +1,16 @@
 <template>
-    <Fieldset legend="Initial Configuration">
+
+<Accordion value="0">
+    <AccordionPanel value="0">
+        <AccordionHeader>Initial Configuration</AccordionHeader>
+        <AccordionContent>
+            <p class="m-0">
+                <Fieldset legend="Initial Configuration">
         <div class="card">
             <h3>Connection Configuration</h3>
             <p>Connection is a crucial thing that ensures proper operation.</p>
 
-            <hr />
+           
             <br />
             <!-- Radio Buttons for Connection Methods -->
             <div class="field">
@@ -50,6 +56,39 @@
             </div>
         </div>
     </Fieldset>
+                </p>
+        </AccordionContent>
+    </AccordionPanel>
+    <AccordionPanel value="1">
+        <AccordionHeader>Header II</AccordionHeader>
+        <AccordionContent>
+            <p class="m-0">
+                Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim
+                ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Consectetur, adipisci velit, sed quia non numquam eius modi.
+            </p>
+        </AccordionContent>
+    </AccordionPanel>
+    <AccordionPanel value="2">
+        <AccordionHeader>Header III</AccordionHeader>
+        <AccordionContent>
+            <p class="m-0">
+                At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa
+                qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus.
+            </p>
+        </AccordionContent>
+    </AccordionPanel>
+</Accordion>
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -72,6 +111,11 @@ import { ref } from 'vue';
 import card from 'primevue/card';
 import { RadioButton, Button, InputText } from 'primevue';
 import Fieldset from 'primevue/fieldset';
+import Accordion from 'primevue/accordion';
+import AccordionPanel from 'primevue/accordionpanel';
+import AccordionHeader from 'primevue/accordionheader';
+import AccordionContent from 'primevue/accordioncontent';
+
 const connectionMethod = ref(null);
 const ipAddress = ref('');
 const subnet = ref('');

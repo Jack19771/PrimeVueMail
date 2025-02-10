@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="app">
     <!-- TopBar na górze strony -->
     <TopBar />
     <Toast />
@@ -40,6 +40,15 @@ onMounted(() => {
   flex-grow: 1;
   margin-top: 80px; 
 }
+
+body {
+  background-color: red;
+  margin: 0;
+  padding: 0;
+  background-color: #6a2c2c;
+}
+
+
 
 
 </style>

@@ -129,7 +129,14 @@ export default {
 </script>
 
 <style scoped>
-
+.alert-banner {
+  background-color: rgb(62, 64, 142);
+  color: white;
+  text-align: center;
+  padding: 1rem;
+  font-weight: bold;
+  font-size: 2.2rem;
+}
 
 .p-button-danger {
   margin: 10px;

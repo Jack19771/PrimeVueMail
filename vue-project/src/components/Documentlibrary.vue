@@ -3,8 +3,12 @@
       <!-- Ribbon - pasek narzędzi -->
       <div v-if="selectedDocuments.length > 0" class="p-d-flex p-jc-between p-mb-3 p-ribbon">
         <Button label="View" icon="pi pi-search" @click="viewDocument" class="p-mr-2" />
+        <Button label="Send To" icon="pi pi-send" @click="deleteDocuments" class="p-mr-2" />
         <Button label="Delete" icon="pi pi-trash" @click="deleteDocuments" class="p-mr-2" />
         <Button label="Edit" icon="pi pi-pencil" @click="editDocument" class="p-mr-2" />
+      </div>
+      <div>
+ 
       </div>
   
       <!-- Panel z tabelą dokumentów -->

@@ -1,10 +1,13 @@
 <template>
   <div>
-    <Toolbar style="position: fixed; top: 0; left: 0; right: 0; z-index: 9999; border-radius: 0; padding: 1rem; background: linear-gradient(to top, #505050 , #000000);">
+    <Toolbar style="position: fixed; top: 0; left: 0; right: 0; z-index: 9999; border-radius: 0; padding: 0rem; background: linear-gradient(to top, #505050 , #000000);">
       <template #start>
         <div class="flex items-center gap-2">
           <router-link to="/" style="display: flex; align-items: center;">
-            <i class="pi pi-envelope" style="font-size: 2rem; color: #ffffff;"></i>
+            
+            <img src="/NATOOTAN.png" alt="NATO Flag" width="150" />
+
+
             <h3 style="margin-left: 10px; color: #ffffff; font-size: 1.5rem; font-weight: bold;">FastTrack 2</h3>
           </router-link>
         </div>
@@ -13,9 +16,9 @@
       <template #end>
         <div class="flex items-center gap-2">
           <router-link to="/settings">
-            <Button label="Settings" severity="contrast" size="small" />
+            <Button label="Settings" icon="pi pi-server"   class="p-button-contrast"  style="margin-right: 20px;" />
           </router-link>
-          <Avatar image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" style="width: 32px; height: 32px" />
+          <Avatar image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" style="width: 32px; height: 32px;margin-right: 5px;" />
         </div>
       </template>
     </Toolbar>
@@ -32,6 +35,7 @@ import Toolbar from 'primevue/toolbar';
 import Button from 'primevue/button';
 import Avatar from 'primevue/avatar';
 import { ref, onMounted } from 'vue';
+import Image from 'primevue/image';
 
 const alertMessage = ref(null);
 
