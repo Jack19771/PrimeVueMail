@@ -42,10 +42,12 @@ onMounted(() => {
         <div class="content" v-if="!isLoading">
             <!-- TabView do wyświetlania zakładek -->
             <TabView>
-                <TabPanel header="About Us">
+                <TabPanel header="News and Updates">
                     <AboutUs />
                 </TabPanel>
                 <TabPanel header="Our Documents">
+                    <Documentlibrary />
+                    <br />
                     <Documentlibrary />
                 </TabPanel>
                 <TabPanel header="Calendar">

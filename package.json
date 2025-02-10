@@ -1,9 +1,9 @@
 {
   "dependencies": {
-    "@fullcalendar/core": "^6.1.15",
-    "@fullcalendar/daygrid": "^6.1.15",
-    "@fullcalendar/interaction": "^6.1.15",
-    "@fullcalendar/vue": "^6.1.15",
+    "@fullcalendar/core": "^5.10.1",
+    "@fullcalendar/daygrid": "^5.10.1",
+    "@fullcalendar/interaction": "^5.10.1",
+    "@fullcalendar/vue": "^5.10.1",
     "@primevue/themes": "^4.2.5",
     "primeicons": "^7.0.0",
     "primevue": "^4.2.5",

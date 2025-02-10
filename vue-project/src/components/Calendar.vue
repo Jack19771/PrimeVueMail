@@ -1,34 +1,26 @@
 <template>
     <div>
-      <FullCalendar 
-        :plugins="calendarPlugins"
-        :initialView="'dayGridMonth'"
-        :events="calendarEvents"
-        :eventClick="handleEventClick"
+      <vue-cal
+        @dayclick="onDayClick"
       />
+      <button @click="testButton">Kliknij tutaj (test)</button>
     </div>
   </template>
   
-  <script setup>
-  import { ref } from 'vue';
-  import FullCalendar from '@fullcalendar/vue';
-  import dayGridPlugin from '@fullcalendar/daygrid';
-  import interactionPlugin from '@fullcalendar/interaction';
+  <script>
+  import VueCal from 'vue-cal';
+  import 'vue-cal/dist/vuecal.css';
   
-  const calendarPlugins = [dayGridPlugin, interactionPlugin];
-  
-  const calendarEvents = ref([
-    { title: 'Meeting with John', start: '2025-02-10T10:00:00' },
-    { title: 'Team Workshop', start: '2025-02-11T12:30:00' },
-    { title: 'Conference', start: '2025-02-15T09:00:00' },
-  ]);
-  
-  const handleEventClick = (info) => {
-    alert('Event clicked: ' + info.event.title);
+  export default {
+    components: { VueCal },
+    methods: {
+      onDayClick(day) {
+        console.log('Kliknięto dzień: ', day);
+      },
+      testButton() {
+        console.log('Działa testowy button!');
+      }
+    }
   };
   </script>
-  
-  <style scoped>
-  /* Dodaj dodatkowy styl, jeśli chcesz */
-  </style>
   
