@@ -15,7 +15,7 @@
       <Panel header="Document Library" class="p-mb-1">
         <div class="p-d-flex p-jc-between p-mb-3">
           <div>
-            <Button label="Add Document" icon="pi pi-plus" @click="addDocument" class="p-mr-2" />
+            <Button label="Add Document" icon="pi pi-plus"   @click="addDocument" class="p-mr-2" />
           </div>
   
           <div>
@@ -25,7 +25,7 @@
   
         <!-- DataTable z dokumentami -->
         <div class="datatable-container">
-          <DataTable 
+          <DataTable  
             v-model:selection="selectedDocuments" 
             :value="filteredDocuments" 
             selectionMode="checkbox" 
@@ -229,5 +229,10 @@
   .p-ribbon button {
     margin-right: 10px;
   }
+
+
+
+
+
   </style>
   

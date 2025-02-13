@@ -32,23 +32,28 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
+<style >
 /* Ustawienie marginesu na lewo, aby zrobić miejsce na stały pasek boczny */
 .content {
-  margin-left: 240px;
+  margin-left: 350px;
   padding: 20px;
   flex-grow: 1;
   margin-top: 80px; 
 }
 
-body {
-  background-color: red;
-  margin: 0;
-  padding: 0;
-  background-color: #6a2c2c;
+.p-breadcrumb-item-label {
+    transition: inherit;
+    color: white;
 }
 
 
-
+.p-fieldset {
+    background: var(--p-fieldset-background);
+    /* border: 1px solid var(--p-fieldset-border-color); */
+    border-radius: var(--p-fieldset-border-radius);
+    color: var(--p-fieldset-color);
+    padding: var(--p-fieldset-padding);
+    margin: 0;
+}
 
 </style>

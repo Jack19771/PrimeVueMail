@@ -1,9 +1,9 @@
 <template>
     <div>
       <vue-cal
+        :events="events"
         @dayclick="onDayClick"
       />
-      <button @click="testButton">Kliknij tutaj (test)</button>
     </div>
   </template>
   
@@ -13,12 +13,16 @@
   
   export default {
     components: { VueCal },
+    data() {
+      return {
+        events: [
+          { start: '2025-02-14 13:00', end: '2025-02-14 14:00', title: 'FastTrack2' }
+        ]
+      };
+    },
     methods: {
       onDayClick(day) {
-        console.log('Kliknięto dzień: ', day);
-      },
-      testButton() {
-        console.log('Działa testowy button!');
+        console.log('Clicked on day: ', day);
       }
     }
   };

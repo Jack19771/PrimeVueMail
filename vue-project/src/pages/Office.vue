@@ -16,6 +16,10 @@ import AboutUs from '../components/Aboutus.vue';  // Zaimportuj komponent AboutU
 import Chat from '../pages/Chat.vue';  // Zaimportuj komponent Chat
 import Members from '../components/Members.vue';  // Zaimportuj komponent Members
 import Calendar from '../components/Calendar.vue';  // Zaimportuj komponent Calendar
+import Navi from '../components/Navi.vue';  // Zaimportuj komponent Navi
+import AIChat from '@/components/AIChat.vue';
+import Footer from '@/components/Footer.vue';
+
 
 
 
@@ -34,7 +38,7 @@ onMounted(() => {
 
 <template>
     <div>
-        <SidebarMenu /> <!-- Pasek boczny z menu -->
+        <Navi /> <!-- Pasek boczny z menu -->
         <!-- Loader (Pokazuje się dopóki isLoading jest true) -->
         <Loader v-if="isLoading" />
 
@@ -63,13 +67,15 @@ onMounted(() => {
                     <Members />
                 </TabPanel>
                 <TabPanel header="AI Assistant">
-                    AI Assistant
+                    <AIChat />
 
 
                 </TabPanel>
             </TabView>
         </div>
     </div>
+
+    <Footer />
 </template>
 
 <style scoped>
