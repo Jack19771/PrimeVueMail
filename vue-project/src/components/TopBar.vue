@@ -57,11 +57,11 @@ import { ref, onMounted } from 'vue';
 
 const home = ref({ icon: 'pi pi-home' });
 const itemy = ref([
-  { label: 'Electronics' },
-  { label: 'Computer' },
-  { label: 'Accessories' },
-  { label: 'Keyboard' },
-  { label: 'Wireless' }
+  { label: 'NATO' },
+  { label: 'SHAPE' },
+  { label: 'Command Group' },
+  { label: 'COS' },
+  { label: 'CSEL' }
 ]);
 
 const alertMessage = ref(null);

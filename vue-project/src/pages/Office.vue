@@ -19,7 +19,7 @@ import Calendar from '../components/Calendar.vue';  // Zaimportuj komponent Cale
 import Navi from '../components/Navi.vue';  // Zaimportuj komponent Navi
 import AIChat from '@/components/AIChat.vue';
 import Footer from '@/components/Footer.vue';
-
+import MapComponent from '@/components/MapComponent.vue';
 
 
 
@@ -68,8 +68,9 @@ onMounted(() => {
                 </TabPanel>
                 <TabPanel header="AI Assistant">
                     <AIChat />
-
-
+                </TabPanel>
+                <TabPanel header="Map">
+                    <MapComponent />
                 </TabPanel>
             </TabView>
         </div>

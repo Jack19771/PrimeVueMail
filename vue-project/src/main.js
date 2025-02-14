@@ -12,6 +12,10 @@ import ToastService from 'primevue/toastservice';
 import Checkbox from 'primevue/checkbox';
 import router from './router'; // Musi być poprawnie zaimportowany router
 import App from './App.vue'
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import 'leaflet/dist/leaflet';
+
 
 const app = createApp(App);
 app.use(PrimeVue, {

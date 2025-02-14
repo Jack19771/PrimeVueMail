@@ -3,7 +3,7 @@
       <Card class="chat-card">
         <template #content>
           <div class="response-container">
-            <h5>AI Answer</h5>
+            <h4>AI Answer</h4>
             <Divider />
             <div v-if="loading" class="loading-indicator">
               <ProgressSpinner />
@@ -71,9 +71,12 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 100vh;
+    height: 80vh;
     width: 150vh;
     padding: 10px;
+    
+    
+    
   }
   .chat-card {
     flex-grow: 1;
@@ -82,6 +85,7 @@
     justify-content: space-between;
     max-width: 100%;
     height: 100%;
+    background-color: #f9f9f9;
   }
   .response-container {
     flex-grow: 1;
