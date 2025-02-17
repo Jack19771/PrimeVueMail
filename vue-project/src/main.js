@@ -1,37 +1,48 @@
-import './assets/main.css'
+import './assets/main.css';
 
-import { createApp } from 'vue'
-import PrimeVue from 'primevue/config'
-import Aura from '@primevue/themes/aura'
-import Lara from '@primevue/themes/lara'
-import material from '@primevue/themes/material'
-import nora from '@primevue/themes/nora'
-import 'primeicons/primeicons.css'
-import Editor from 'primevue/editor';
+import { createApp } from 'vue';
+import PrimeVue from 'primevue/config';
+import Aura from '@primevue/themes/aura';
+import 'primeicons/primeicons.css';
 import ToastService from 'primevue/toastservice';
-import Checkbox from 'primevue/checkbox';
-import router from './router'; // Musi być poprawnie zaimportowany router
-import App from './App.vue'
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import 'leaflet/dist/leaflet';
-
+import router from './router';
+import App from './App.vue';
+import keycloak from './keycloak'; // Import Keycloak
 
 const app = createApp(App);
+
 app.use(PrimeVue, {
-     theme: {
-        preset : Aura,
-        
-         },
+    theme: {
+        preset: Aura,
+    },
 });
-app.use(ToastService); // Dodanie ToastService
+app.use(ToastService);
 app.use(router);
+
+// Zapobieganie wielokrotnej inicjalizacji (szczególnie podczas HMR)
+if (!window.__KEYCLOAK_INIT) {
+    window.__KEYCLOAK_INIT = true;
+    keycloak.init({ 
+        onLoad: 'login-required', 
+        checkLoginIframe: false // Wyłączenie sprawdzania iframe (jeśli potrzebne)
+    }).then((authenticated) => {
+        if (!authenticated) {
+            window.location.reload();
+        } else {
+            app.config.globalProperties.$keycloak = keycloak;
+            app.mount('#app');
+        }
+    }).catch(() => {
+        console.error('Błąd inicjalizacji Keycloak');
+    });
+} else {
+    // Jeśli już inicjalizowano, po prostu przypisz Keycloak i zamontuj aplikację
+    app.config.globalProperties.$keycloak = keycloak;
+    app.mount('#app');
+}
+
 export default {
-   components: {
-     Checkbox
-   }
- };
-
-app.mount('#app')
-
-
+    components: {
+        // Twoje komponenty (np. Checkbox)
+    },
+};

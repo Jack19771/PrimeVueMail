@@ -13,6 +13,7 @@
     "@primevue/themes": "^4.2.5",
     "@tailwindcss/vite": "^4.0.6",
     "axios": "^1.7.9",
+    "keycloak-js": "^26.1.2",
     "leaflet": "^1.9.4",
     "primeicons": "^7.0.0",
     "primevue": "^4.2.5",

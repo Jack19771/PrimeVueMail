@@ -11,6 +11,10 @@ RUN npm install
 # Kopiujemy resztę plików aplikacji
 COPY . .
 
+# Dodajemy obsługę Keycloak URL jako zmienną środowiskową
+ARG VITE_KEYCLOAK_URL
+ENV VITE_KEYCLOAK_URL=$VITE_KEYCLOAK_URL
+
 # Budujemy aplikację (Vite utworzy folder 'dist')
 RUN npm run build
 
@@ -19,9 +23,6 @@ FROM nginx:stable-alpine
 
 # Kopiujemy zbudowaną aplikację do katalogu, który Nginx domyślnie serwuje
 COPY --from=builder /app/dist /usr/share/nginx/html
-
-# Opcjonalnie: jeśli korzystasz z trybu history (Vue Router) utwórz własny plik konfiguracji Nginx
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Otwieramy port 80
 EXPOSE 80

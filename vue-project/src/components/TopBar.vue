@@ -1,14 +1,6 @@
 <template>
   <div>
-    <Toolbar style="
-      position: fixed; 
-      top: 0; 
-      left: 0; 
-      right: 0; 
-      z-index: 9999; 
-      border-radius: 0; 
-      padding: 0rem; 
-      background: linear-gradient(45deg, #000, hsl(220, 44%, 18%), hsl(220, 30%, 28%));">
+    <Toolbar style="position: fixed; top: 0; left: 0; right: 0; z-index: 9999; border-radius: 0; padding: 0rem; background: linear-gradient(45deg, #000, hsl(220, 44%, 18%), hsl(220, 30%, 28%));">
       <template #start>
         <div class="flex items-start gap-2">
           <router-link to="/" style="display: flex; align-items: center;">
@@ -25,16 +17,16 @@
       <template #center>
         <FloatLabel variant="on" style="width: 300px;">
           <InputText id="on_label" v-model="searchQuery" autocomplete="off" placeholder="Search..." style="width: 150%;" />
-          
         </FloatLabel>
       </template>
 
       <template #end>
         <div class="flex items-center gap-2">
-          <router-link to="/settings">
-            <Button label="Settings" icon="pi pi-server" class="p-button-contrast" style="margin-right: 20px;" />
-          </router-link>
-          <Avatar image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" style="width: 32px; height: 32px;margin-right: 5px;" />
+          <div v-if="user" class="user-info">
+            <span class="username">👤 {{ user.preferred_username }}</span>
+            <Button label="Logout" icon="pi pi-sign-out" class="p-button-danger" @click="logout" />
+          </div>
+          <Avatar :image="avatarUrl" style="width: 32px; height: 32px; margin-right: 5px;" />
         </div>
       </template>
     </Toolbar>
@@ -54,6 +46,7 @@ import Breadcrumb from 'primevue/breadcrumb';
 import FloatLabel from 'primevue/floatlabel';
 import InputText from 'primevue/inputtext';
 import { ref, onMounted } from 'vue';
+import keycloak from '../keycloak'; // Import Keycloak
 
 const home = ref({ icon: 'pi pi-home' });
 const itemy = ref([
@@ -66,9 +59,17 @@ const itemy = ref([
 
 const alertMessage = ref(null);
 const searchQuery = ref('');
+const user = ref(null);
+const avatarUrl = ref('https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png');
+
 let websocket;
 
+// Pobranie danych użytkownika po zalogowaniu
 onMounted(() => {
+  if (keycloak.authenticated) {
+    user.value = keycloak.tokenParsed;
+  }
+
   websocket = new WebSocket('ws://localhost:8000/ws');
 
   websocket.onmessage = (event) => {
@@ -81,6 +82,11 @@ onMounted(() => {
     }
   };
 });
+
+// Funkcja do wylogowania
+const logout = () => {
+  keycloak.logout();
+};
 </script>
 
 <style scoped>
@@ -123,5 +129,26 @@ onMounted(() => {
   right: 0;
   z-index: 1000;
   font-weight: bold;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.username {
+  color: white;
+  font-weight: bold;
+}
+
+button {
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-top: 10px;
 }
 </style>
