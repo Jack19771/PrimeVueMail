@@ -33,6 +33,21 @@
   import Button from 'primevue/button';
   import InputText from 'primevue/inputtext';
   import Checkbox from 'primevue/checkbox';
+
+  // Get logged user
+import keycloak from '@/keycloak'; // Importujemy Keycloak
+
+const username = ref('Anonimowy'); // Domyślnie anonimowy użytkownik
+
+onMounted(() => {
+  if (keycloak.authenticated) {
+    username.value = keycloak.tokenParsed?.preferred_username || keycloak.tokenParsed?.name || 'Anonimowy';
+    console.log("Zalogowany użytkownik:", username.value); // Sprawdzamy w konsoli
+  } else {
+    console.log("Użytkownik niezalogowany");
+  }
+});
+
   
   // WebSocket
   const socket = new WebSocket('ws://192.168.178.73:8000/ws');  // Upewnij się, że adres i port są poprawne
@@ -58,38 +73,47 @@
   
   // Send message function
   const sendMessage = () => {
-    if (newMessage.value.trim()) {
-      const message = {
-        text: newMessage.value,
-        author: 'Ty ',  // Ustawiamy na "Ty" jeśli to nasza wiadomość
-        timestamp: getCurrentTimestamp(),
-        isSent: true,
-        isImportant: isImportant.value,
-      };
-      messages.value.push(message);  // Dodaj wiadomość do listy
-      socket.send(newMessage.value);  // Wysyłamy wiadomość przez WebSocket
-      newMessage.value = '';
-      isImportant.value = false;  // Resetujemy flagę IMPORTANT po wysłaniu
-      nextTick(scrollToBottom);  // Przewiń na dół po wysłaniu wiadomości
-    }
-  };
+  if (newMessage.value.trim()) {
+    const message = {
+      id: Date.now(), // Każda wiadomość dostaje unikalny identyfikator
+      text: newMessage.value,
+      author: username.value,  // Pobieramy zalogowanego użytkownika z Keycloak
+      timestamp: getCurrentTimestamp(),
+      isSent: true,
+      isImportant: isImportant.value,
+    };
+
+    socket.send(JSON.stringify(message));  // Wysyłamy pełny JSON przez WebSocket
+    newMessage.value = '';
+    isImportant.value = false;
+    nextTick(scrollToBottom);
+  }
+};
+
+
   
   // Listen for incoming messages from WebSocket server
   socket.onmessage = (event) => {
-    if (typeof event.data === 'string') {
-      const message = {
-        text: event.data,
-        author: 'Partner ',  // Przypisujemy "Partner" dla wiadomości przychodzących
-        timestamp: getCurrentTimestamp(),
-        isSent: false,
-        isImportant: false,  // Zakładając, że wiadomości przychodzące nie są oznaczone jako IMPORTANT
-      };
-      messages.value.push(message);
+  try {
+    const receivedMessage = JSON.parse(event.data); // Parsujemy JSON
+
+    // Sprawdzamy, czy już mamy wiadomość o tym samym ID
+    if (!messages.value.some(msg => msg.id === receivedMessage.id)) {
+      messages.value.push({
+        id: receivedMessage.id,
+        text: receivedMessage.text,
+        author: receivedMessage.author || 'Anonimowy', // Pobieramy autora lub "Anonimowy"
+        timestamp: receivedMessage.timestamp || getCurrentTimestamp(),
+        isSent: receivedMessage.author === username.value, // Jeśli to nasza wiadomość, ustawiamy isSent
+        isImportant: receivedMessage.isImportant || false,
+      });
       nextTick(scrollToBottom);
-    } else {
-      console.error('Received non-text data:', event.data);
     }
-  };
+  } catch (error) {
+    console.error('Błąd parsowania wiadomości:', error);
+  }
+};
+
   
   // WebSocket error handling
   socket.onerror = (error) => {

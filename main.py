@@ -11,8 +11,10 @@ import base64
 import subprocess
 from kademlia.network import Server
 import asyncio
+from routes import upload  # <-- Importujemy nasz plik `upload.py`
 
 app = FastAPI()
+app.include_router(upload.router)
 
 # Lista aktywnych połączeń WebSocket
 active_connections = []
@@ -23,19 +25,29 @@ alert_state = {"alert": None}
 async def websocket_endpoint(websocket: WebSocket):
     try:
         await websocket.accept()
-        print("WebSocket connection accepted")  # Logowanie po otwarciu połączenia
+        print("WebSocket connection accepted")
         active_connections.append(websocket)
         
         while True:
             message = await websocket.receive_text()
-            print(f"Received message: {message}")  # Logowanie odebranej wiadomości
+            try:
+                data = json.loads(message)  # Parsujemy JSON
+                print(f"Received message: {data}")  # Logowanie wiadomości
+
+                # Dodaj timestamp na serwerze, jeśli go nie ma
+                if "timestamp" not in data:
+                    from datetime import datetime
+                    data["timestamp"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+                # Wysyłamy wiadomość do wszystkich klientów (łącznie z nadawcą)
+                for connection in active_connections:
+                    await connection.send_text(json.dumps(data))  # Wysyłamy JSON
+                
+            except json.JSONDecodeError:
+                print("Received invalid JSON message")  # Obsługa błędów JSON
             
-            # Wysyłamy wiadomość do innych połączeń WebSocket
-            for connection in active_connections:
-                if connection != websocket:
-                    await connection.send_text(message)
     except WebSocketDisconnect:
-        print("WebSocket disconnected")  # Logowanie przy rozłączeniu
+        print("WebSocket disconnected")
         active_connections.remove(websocket)
 
 @app.post("/send-alert")

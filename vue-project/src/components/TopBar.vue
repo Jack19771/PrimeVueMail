@@ -27,6 +27,9 @@
             <Button label="Logout" icon="pi pi-sign-out" class="p-button-danger" @click="logout" />
           </div>
           <Avatar :image="avatarUrl" style="width: 32px; height: 32px; margin-right: 5px;" />
+          <router-link to="/settings">
+            <Button label="Settings" icon="pi pi-server" class="p-button-contrast" style="margin-right: 20px;" />
+          </router-link>
         </div>
       </template>
     </Toolbar>
