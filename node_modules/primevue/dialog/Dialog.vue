@@ -62,9 +62,8 @@
 </template>
 
 <script>
-import { addClass, addStyle, blockBodyScroll, focus, getOuterHeight, getOuterWidth, getViewport, setAttribute, unblockBodyScroll } from '@primeuix/utils/dom';
+import { addClass, addStyle, focus, getOuterHeight, getOuterWidth, getViewport, setAttribute } from '@primeuix/utils/dom';
 import { ZIndex } from '@primeuix/utils/zindex';
-import { UniqueComponentId } from '@primevue/core/utils';
 import TimesIcon from '@primevue/icons/times';
 import WindowMaximizeIcon from '@primevue/icons/windowmaximize';
 import WindowMinimizeIcon from '@primevue/icons/windowminimize';
@@ -72,6 +71,7 @@ import Button from 'primevue/button';
 import FocusTrap from 'primevue/focustrap';
 import Portal from 'primevue/portal';
 import Ripple from 'primevue/ripple';
+import { blockBodyScroll, unblockBodyScroll } from 'primevue/utils';
 import { computed } from 'vue';
 import BaseDialog from './BaseDialog.vue';
 
@@ -87,18 +87,12 @@ export default {
     },
     data() {
         return {
-            id: this.$attrs.id,
             containerVisible: this.visible,
             maximized: false,
             focusableMax: null,
             focusableClose: null,
             target: null
         };
-    },
-    watch: {
-        '$attrs.id': function (newValue) {
-            this.id = newValue || UniqueComponentId();
-        }
     },
     documentKeydownListener: null,
     container: null,
@@ -133,8 +127,6 @@ export default {
         this.mask = null;
     },
     mounted() {
-        this.id = this.id || UniqueComponentId();
-
         if (this.breakpoints) {
             this.createStyle();
         }
@@ -409,7 +401,7 @@ export default {
             return this.maximized ? (this.minimizeIcon ? 'span' : 'WindowMinimizeIcon') : this.maximizeIcon ? 'span' : 'WindowMaximizeIcon';
         },
         ariaLabelledById() {
-            return this.header != null || this.$attrs['aria-labelledby'] !== null ? this.id + '_header' : null;
+            return this.header != null || this.$attrs['aria-labelledby'] !== null ? this.$id + '_header' : null;
         },
         closeAriaLabel() {
             return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.close : undefined;

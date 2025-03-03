@@ -91,11 +91,14 @@ export default {
                 this.d_loading = newValue;
             }
         },
-        items(newValue, oldValue) {
-            if (!oldValue || oldValue.length !== (newValue || []).length) {
-                this.init();
-                this.calculateAutoSize();
-            }
+        items: {
+            handler(newValue, oldValue) {
+                if (!oldValue || oldValue.length !== (newValue || []).length) {
+                    this.init();
+                    this.calculateAutoSize();
+                }
+            },
+            deep: true
         },
         itemSize() {
             this.init();
@@ -312,7 +315,7 @@ export default {
                 Promise.resolve().then(() => {
                     this.lazyLoadState = {
                         first: this.step ? (both ? { rows: 0, cols: first.cols } : 0) : first,
-                        last: Math.min(this.step ? this.step : last, this.items?.length || 0)
+                        last: Math.min(this.step ? this.step : last, this.items?.length - 1 || 0)
                     };
 
                     this.$emit('lazy-load', this.lazyLoadState);
@@ -427,9 +430,12 @@ export default {
                 return _currentIndex <= _numT ? _numT : _isScrollDownOrRight ? _last - _num - _numT : _first + _numT - 1;
             };
 
-            const calculateFirst = (_currentIndex, _triggerIndex, _first, _last, _num, _numT, _isScrollDownOrRight) => {
+            const calculateFirst = (_currentIndex, _triggerIndex, _first, _last, _num, _numT, _isScrollDownOrRight, _isCols) => {
                 if (_currentIndex <= _numT) return 0;
-                else return Math.max(0, _isScrollDownOrRight ? (_currentIndex < _triggerIndex ? _first : _currentIndex - _numT) : _currentIndex > _triggerIndex ? _first : _currentIndex - 2 * _numT);
+                const firstValue = Math.max(0, _isScrollDownOrRight ? (_currentIndex < _triggerIndex ? _first : _currentIndex - _numT) : _currentIndex > _triggerIndex ? _first : _currentIndex - 2 * _numT);
+                const maxFirst = this.getLast(firstValue, _isCols);
+                if (firstValue > maxFirst) return maxFirst - _num;
+                else return firstValue;
             };
 
             const calculateLast = (_currentIndex, _first, _last, _num, _numT, _isCols) => {
@@ -463,7 +469,7 @@ export default {
 
                     newFirst = {
                         rows: calculateFirst(currentIndex.rows, triggerIndex.rows, this.first.rows, this.last.rows, this.numItemsInViewport.rows, this.d_numToleratedItems[0], isScrollDown),
-                        cols: calculateFirst(currentIndex.cols, triggerIndex.cols, this.first.cols, this.last.cols, this.numItemsInViewport.cols, this.d_numToleratedItems[1], isScrollRight)
+                        cols: calculateFirst(currentIndex.cols, triggerIndex.cols, this.first.cols, this.last.cols, this.numItemsInViewport.cols, this.d_numToleratedItems[1], isScrollRight, true)
                     };
                     newLast = {
                         rows: calculateLast(currentIndex.rows, newFirst.rows, this.last.rows, this.numItemsInViewport.rows, this.d_numToleratedItems[0]),
@@ -512,7 +518,7 @@ export default {
                 if (this.lazy && this.isPageChanged(first)) {
                     const lazyLoadState = {
                         first: this.step ? Math.min(this.getPageByFirst(first) * this.step, (this.items?.length || 0) - this.step) : first,
-                        last: Math.min(this.step ? (this.getPageByFirst(first) + 1) * this.step : last, this.items?.length || 0)
+                        last: Math.min(this.step ? (this.getPageByFirst(first) + 1) * this.step : last, this.items?.length - 1 || 0)
                     };
                     const isLazyStateChanged = this.lazyLoadState.first !== lazyLoadState.first || this.lazyLoadState.last !== lazyLoadState.last;
 

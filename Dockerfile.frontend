@@ -1,0 +1,27 @@
+# Stage 1: Budowanie aplikacji Vue
+FROM node:18-alpine AS builder
+WORKDIR /app
+
+# Przechodzimy do folderu `vue-project`
+COPY vue-project/package*.json ./ 
+
+# Instalujemy zależności
+RUN npm install --legacy-peer-deps
+
+# Kopiujemy resztę plików aplikacji Vue
+COPY vue-project ./ 
+
+# Budujemy aplikację Vue
+RUN npm run build
+
+# Stage 2: Serwowanie aplikacji przy użyciu Nginx (domyślna konfiguracja)
+FROM nginx:stable-alpine
+
+# Kopiujemy zbudowaną aplikację do katalogu, który Nginx domyślnie serwuje
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Otwieramy port 80
+EXPOSE 80
+
+# Uruchamiamy Nginx w trybie pierwszego planu
+CMD ["nginx", "-g", "daemon off;"]
