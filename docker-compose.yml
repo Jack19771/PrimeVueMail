@@ -19,6 +19,40 @@ services:
     depends_on:
       - postgres
 
+  kademlia-bootstrap:
+    build:
+      context: .  # W katalogu głównym projektu
+      dockerfile: Dockerfile.kademlia  # Tworzymy osobny Dockerfile dla Kademlia
+    container_name: kademlia-bootstrap
+    ports:
+      - "8468:8468/udp"  # Główny port bootstrap
+    environment:
+      NODE_TYPE: "bootstrap"
+
+  kademlia-node:
+    build:
+      context: .  # W katalogu głównym projektu
+      dockerfile: Dockerfile.kademlia  # Ten sam Dockerfile
+    container_name: kademlia-node
+    depends_on:
+      - kademlia-bootstrap
+    environment:
+      NODE_TYPE: "node"
+      BOOTSTRAP_IP: "kademlia-bootstrap"
+      BOOTSTRAP_PORT: "8468"
+
+  kademlia-node2:
+    build:
+      context: .  # W katalogu głównym projektu
+      dockerfile: Dockerfile.kademlia  # Ten sam Dockerfile
+    container_name: kademlia-node2
+    depends_on:
+      - kademlia-bootstrap
+    environment:
+      NODE_TYPE: "node"
+      BOOTSTRAP_IP: "kademlia-bootstrap"
+      BOOTSTRAP_PORT: "8468"
+
   postgres:
     image: postgres:15
     container_name: keycloak-db
