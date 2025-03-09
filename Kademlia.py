@@ -19,7 +19,7 @@ server = Server()
 async def create_bootstrap_node():
     """Uruchamia bootstrap node."""
     log.info("🚀 Tworzenie pierwszego węzła Kademlia (bootstrap node)")
-    await server.listen(8468)
+    await server.listen(8468,interface="0.0.0.0")
     log.info("✅ Węzeł bootstrap działa na porcie 8468")
     while True:
         await asyncio.sleep(3600)  # Utrzymanie działania
@@ -31,7 +31,7 @@ async def connect_to_bootstrap():
     bootstrap_port = int(os.getenv("BOOTSTRAP_PORT", "8468"))
     log.info(f"🔗 Próba połączenia z {bootstrap_ip}:{bootstrap_port}")
 
-    await server.listen(8469)
+    await server.listen(8469,interface="0.0.0.0")
     await server.bootstrap([(bootstrap_ip, bootstrap_port)])
     log.info("✅ Połączono z siecią Kademlia")
     while True:

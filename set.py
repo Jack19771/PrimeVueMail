@@ -16,7 +16,7 @@ log.setLevel(logging.DEBUG)
 
 async def run():
     server = Server()
-    await server.listen(8470)  # Użyj innego portu dla klienta
+    await server.listen(8468)  # Użyj innego portu dla klienta
     bootstrap_node = (sys.argv[1], int(sys.argv[2]))
     
     try:

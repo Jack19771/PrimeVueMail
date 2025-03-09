@@ -118,17 +118,23 @@ async def get_alert_status():
     # Zwróć aktualny status alertu
     return {"alert": alert_state["alert"]}
 
+import subprocess
+
 def call_set_script(bootstrap_node, bootstrap_port, key, value):
     try:
+        print(f"🚀 Uruchamiam set.py z parametrami: {bootstrap_node} {bootstrap_port} {key} {value}")
         result = subprocess.run(
             ['python', 'set.py', bootstrap_node, str(bootstrap_port), key, value], 
             check=True, capture_output=True, text=True
         )
         print("✅ Dane zostały pomyślnie wstawione do Kademlia.")
-        print("📜 OUTPUT:", result.stdout)
+        print("📜 STDOUT:", result.stdout)
+        print("⚠️ STDERR:", result.stderr)
     except subprocess.CalledProcessError as e:
         print(f"❌ Błąd podczas wywoływania set.py: {e}")
         print("⚠️ STDERR:", e.stderr)
+
+
 
 # Dodanie CORS middleware
 app.add_middleware(
@@ -242,7 +248,7 @@ async def send_mail(email: EmailMessage):
         encrypted_filename = f"messages/encrypted_{email.subject.replace(' ', '_')}_{email.recipient}.txt"  # Używamy .txt dla ASCII
         with open(encrypted_filename, 'w') as enc_file:
             enc_file.write(encrypted_message)  # Zapisujemy zaszyfrowaną wiadomość w Base64 jako tekst
-            call_set_script('127.0.0.1', 8468, 'email', 'Jacek')
+            call_set_script("kademlia-bootstrap", "8468", "mail", "Jacek")  # Wywołanie skryptu set.py
             #
         # Wczytanie klucza prywatnego i podpisywanie wiadomości
         with open('keys/private_key.pem', 'rb') as priv_file:

@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   keycloak:
     image: quay.io/keycloak/keycloak:22.0
@@ -18,40 +20,57 @@ services:
     command: start-dev
     depends_on:
       - postgres
+    networks:
+      - mynetwork
 
   kademlia-bootstrap:
     build:
-      context: .  # W katalogu głównym projektu
-      dockerfile: Dockerfile.kademlia  # Tworzymy osobny Dockerfile dla Kademlia
+      context: .  # Build from the project root
+      dockerfile: Dockerfile.kademlia
     container_name: kademlia-bootstrap
     ports:
-      - "8468:8468/udp"  # Główny port bootstrap
+      - "8468:8468/udp"  # UDP & TCP for Kademlia
+      - "8468:8468/tcp"
+      - "8469:8469/udp"
+      - "8469:8469/tcp"
     environment:
       NODE_TYPE: "bootstrap"
+    networks:
+      - mynetwork
 
   kademlia-node:
     build:
-      context: .  # W katalogu głównym projektu
-      dockerfile: Dockerfile.kademlia  # Ten sam Dockerfile
+      context: .
+      dockerfile: Dockerfile.kademlia
     container_name: kademlia-node
     depends_on:
       - kademlia-bootstrap
+    ports:
+      - "8470:8470/udp"
+      - "8470:8470/tcp"
     environment:
       NODE_TYPE: "node"
       BOOTSTRAP_IP: "kademlia-bootstrap"
       BOOTSTRAP_PORT: "8468"
+    networks:
+      - mynetwork
 
   kademlia-node2:
     build:
-      context: .  # W katalogu głównym projektu
-      dockerfile: Dockerfile.kademlia  # Ten sam Dockerfile
+      context: .
+      dockerfile: Dockerfile.kademlia
     container_name: kademlia-node2
     depends_on:
       - kademlia-bootstrap
+    ports:
+      - "8471:8471/udp"
+      - "8471:8471/tcp"
     environment:
       NODE_TYPE: "node"
       BOOTSTRAP_IP: "kademlia-bootstrap"
       BOOTSTRAP_PORT: "8468"
+    networks:
+      - mynetwork
 
   postgres:
     image: postgres:15
@@ -65,25 +84,28 @@ services:
       POSTGRES_PASSWORD: keycloak
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - mynetwork
 
   primevue-app:
     build:
-      context: .  # 🔹 Vue buduje się z katalogu głównego
-      dockerfile: Dockerfile.frontend  # 🔹 Musi używać `Dockerfile.frontend`
+      context: .
+      dockerfile: Dockerfile.frontend
     container_name: primevue-app
     ports:
       - "8081:80"
     environment:
       VITE_KEYCLOAK_URL: "http://keycloak:8080"
-      API_URL: "http://fastapi-backend:8000"  # 🔹 Vue komunikuje się z backendem
+      API_URL: "http://fastapi-backend:8000"
     depends_on:
       - keycloak
-      - fastapi-backend  # 🔹 Vue czeka na FastAPI
-
+      - fastapi-backend
+    networks:
+      - mynetwork
 
   fastapi-backend:
     build:
-      context: .  # 🔹 Backend FastAPI znajduje się w katalogu głównym
+      context: .
       dockerfile: Dockerfile.backend
     container_name: fastapi-backend
     ports:
@@ -92,6 +114,8 @@ services:
       MONGO_URI: "mongodb://admin:secret@mongodb:27017"
     depends_on:
       - mongodb
+    networks:
+      - mynetwork
 
   mongodb:
     image: mongo:latest
@@ -104,6 +128,8 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: secret
+    networks:
+      - mynetwork
 
   mongo-express:
     image: mongo-express
@@ -114,8 +140,14 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: admin
       ME_CONFIG_MONGODB_ADMINPASSWORD: secret
-      ME_CONFIG_MONGODB_SERVER: mongodb    
+      ME_CONFIG_MONGODB_SERVER: mongodb
+    networks:
+      - mynetwork
 
 volumes:
   postgres_data:
   mongodb_data:
+
+networks:
+  mynetwork:
+    driver: bridge
