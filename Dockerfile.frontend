@@ -14,13 +14,19 @@ COPY vue-project ./
 # Budujemy aplikację Vue
 RUN npm run build
 
-# Stage 2: Serwowanie aplikacji przy użyciu Nginx (domyślna konfiguracja)
+# Stage 2: Serwowanie aplikacji przy użyciu Nginx
 FROM nginx:stable-alpine
+
+# Usuń domyślną konfigurację Nginx
+RUN rm /etc/nginx/conf.d/default.conf
 
 # Kopiujemy zbudowaną aplikację do katalogu, który Nginx domyślnie serwuje
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Otwieramy port 80
+# Kopiujemy nową konfigurację Nginx z obsługą Yggdrasil
+COPY default.conf /etc/nginx/conf.d/default.conf
+
+# Otwieramy port 80 (dla IPv4 i IPv6, w tym Yggdrasil)
 EXPOSE 80
 
 # Uruchamiamy Nginx w trybie pierwszego planu

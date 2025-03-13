@@ -1,6 +1,29 @@
 version: '3.8'
 
 services:
+  yggdrasil:
+    build:
+      context: .
+      dockerfile: Dockerfile.yggdrasil
+    container_name: yggdrasil
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    volumes:
+      - "./yggdrasil.conf:/etc/yggdrasil.conf"
+      - "./supervisord.conf:/etc/supervisord.conf"
+    sysctls:
+      - "net.ipv6.conf.all.disable_ipv6=0"
+    mac_address: "1E:FC:B2:8D:DF:D4"
+    depends_on:
+    - primevue-app
+    networks:
+      - yggdrasil_network
+    
+      
+      
+
   keycloak:
     image: quay.io/keycloak/keycloak:22.0
     container_name: keycloak
@@ -22,14 +45,15 @@ services:
       - postgres
     networks:
       - mynetwork
+      - yggdrasil_network
 
   kademlia-bootstrap:
     build:
-      context: .  # Build from the project root
+      context: .
       dockerfile: Dockerfile.kademlia
     container_name: kademlia-bootstrap
     ports:
-      - "8468:8468/udp"  # UDP & TCP for Kademlia
+      - "8468:8468/udp"
       - "8468:8468/tcp"
       - "8469:8469/udp"
       - "8469:8469/tcp"
@@ -37,6 +61,7 @@ services:
       NODE_TYPE: "bootstrap"
     networks:
       - mynetwork
+      - yggdrasil_network
 
   kademlia-node:
     build:
@@ -54,6 +79,7 @@ services:
       BOOTSTRAP_PORT: "8468"
     networks:
       - mynetwork
+      - yggdrasil_network
 
   kademlia-node2:
     build:
@@ -71,6 +97,7 @@ services:
       BOOTSTRAP_PORT: "8468"
     networks:
       - mynetwork
+      - yggdrasil_network
 
   postgres:
     image: postgres:15
@@ -86,6 +113,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - mynetwork
+      - yggdrasil_network
 
   primevue-app:
     build:
@@ -102,6 +130,7 @@ services:
       - fastapi-backend
     networks:
       - mynetwork
+      - yggdrasil_network
 
   fastapi-backend:
     build:
@@ -116,6 +145,7 @@ services:
       - mongodb
     networks:
       - mynetwork
+      - yggdrasil_network
 
   mongodb:
     image: mongo:latest
@@ -130,6 +160,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: secret
     networks:
       - mynetwork
+      - yggdrasil_network
 
   mongo-express:
     image: mongo-express
@@ -143,11 +174,19 @@ services:
       ME_CONFIG_MONGODB_SERVER: mongodb
     networks:
       - mynetwork
+      - yggdrasil_network
 
 volumes:
   postgres_data:
   mongodb_data:
+  yggdrasil_config:
 
 networks:
   mynetwork:
     driver: bridge
+  yggdrasil_network:
+    driver: bridge
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: fd00::/8
