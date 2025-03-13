@@ -1,0 +1,192 @@
+version: '3.8'
+
+services:
+  yggdrasil:
+    build:
+      context: .
+      dockerfile: Dockerfile.yggdrasil
+    container_name: yggdrasil
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    volumes:
+      - "./yggdrasil.conf:/etc/yggdrasil.conf"
+      - "./supervisord.conf:/etc/supervisord.conf"
+    sysctls:
+      - "net.ipv6.conf.all.disable_ipv6=0"
+    mac_address: "1E:FC:B2:8D:DF:D4"
+    depends_on:
+    - primevue-app
+    networks:
+      - yggdrasil_network
+    
+      
+      
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0
+    container_name: keycloak
+    ports:
+      - "8080:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_PROXY: edge
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME_STRICT: "false"
+      KC_DB: postgres
+      KC_DB_URL_HOST: keycloak-db
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+    command: start-dev
+    depends_on:
+      - postgres
+    networks:
+      - mynetwork
+      - yggdrasil_network
+
+  kademlia-bootstrap:
+    build:
+      context: .
+      dockerfile: Dockerfile.kademlia
+    container_name: kademlia-bootstrap
+    ports:
+      - "8468:8468/udp"
+      - "8468:8468/tcp"
+      - "8469:8469/udp"
+      - "8469:8469/tcp"
+    environment:
+      NODE_TYPE: "bootstrap"
+    networks:
+      - mynetwork
+      - yggdrasil_network
+
+  kademlia-node:
+    build:
+      context: .
+      dockerfile: Dockerfile.kademlia
+    container_name: kademlia-node
+    depends_on:
+      - kademlia-bootstrap
+    ports:
+      - "8470:8470/udp"
+      - "8470:8470/tcp"
+    environment:
+      NODE_TYPE: "node"
+      BOOTSTRAP_IP: "kademlia-bootstrap"
+      BOOTSTRAP_PORT: "8468"
+    networks:
+      - mynetwork
+      - yggdrasil_network
+
+  kademlia-node2:
+    build:
+      context: .
+      dockerfile: Dockerfile.kademlia
+    container_name: kademlia-node2
+    depends_on:
+      - kademlia-bootstrap
+    ports:
+      - "8471:8471/udp"
+      - "8471:8471/tcp"
+    environment:
+      NODE_TYPE: "node"
+      BOOTSTRAP_IP: "kademlia-bootstrap"
+      BOOTSTRAP_PORT: "8468"
+    networks:
+      - mynetwork
+      - yggdrasil_network
+
+  postgres:
+    image: postgres:15
+    container_name: keycloak-db
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - mynetwork
+      - yggdrasil_network
+
+  primevue-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: primevue-app
+    ports:
+      - "8081:80"
+    environment:
+      VITE_KEYCLOAK_URL: "http://keycloak:8080"
+      API_URL: "http://fastapi-backend:8000"
+    depends_on:
+      - keycloak
+      - fastapi-backend
+    networks:
+      - mynetwork
+      - yggdrasil_network
+
+  fastapi-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: fastapi-backend
+    ports:
+      - "8000:8000"
+    environment:
+      MONGO_URI: "mongodb://admin:secret@mongodb:27017"
+    depends_on:
+      - mongodb
+    networks:
+      - mynetwork
+      - yggdrasil_network
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: secret
+    networks:
+      - mynetwork
+      - yggdrasil_network
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    restart: always
+    ports:
+      - "8082:8082"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: secret
+      ME_CONFIG_MONGODB_SERVER: mongodb
+    networks:
+      - mynetwork
+      - yggdrasil_network
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  yggdrasil_config:
+
+networks:
+  mynetwork:
+    driver: bridge
+  yggdrasil_network:
+    driver: bridge
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: fd00::/8

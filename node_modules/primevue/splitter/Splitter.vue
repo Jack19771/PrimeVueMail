@@ -23,7 +23,7 @@
 
 <script>
 import { getHeight, getOuterHeight, getOuterWidth, getWidth, isRTL } from '@primeuix/utils/dom';
-import { isArray } from '@primeuix/utils/object';
+import { isArray, isNotEmpty } from '@primeuix/utils/object';
 import { getVNodeProp } from '@primevue/core/utils';
 import BaseSplitter from './BaseSplitter.vue';
 
@@ -76,7 +76,7 @@ export default {
                     let _panelSizes = [];
 
                     this.panels.map((panel, i) => {
-                        let panelInitialSize = panel.props && panel.props.size ? panel.props.size : null;
+                        let panelInitialSize = panel.props && isNotEmpty(panel.props.size) ? panel.props.size : null;
                         let panelSize = panelInitialSize || 100 / this.panels.length;
 
                         _panelSizes[i] = panelSize;
@@ -139,13 +139,16 @@ export default {
                 newNextPanelSize = this.nextPanelSize - newPos;
             }
 
-            if (this.validateResize(newPrevPanelSize, newNextPanelSize)) {
-                this.prevPanelElement.style.flexBasis = 'calc(' + newPrevPanelSize + '% - ' + (this.panels.length - 1) * this.gutterSize + 'px)';
-                this.nextPanelElement.style.flexBasis = 'calc(' + newNextPanelSize + '% - ' + (this.panels.length - 1) * this.gutterSize + 'px)';
-                this.panelSizes[this.prevPanelIndex] = newPrevPanelSize;
-                this.panelSizes[this.prevPanelIndex + 1] = newNextPanelSize;
-                this.prevSize = parseFloat(newPrevPanelSize).toFixed(4);
+            if (!this.validateResize(newPrevPanelSize, newNextPanelSize)) {
+                newPrevPanelSize = Math.min(Math.max(this.prevPanelMinSize, newPrevPanelSize), 100 - this.nextPanelMinSize);
+                newNextPanelSize = Math.min(Math.max(this.nextPanelMinSize, newNextPanelSize), 100 - this.prevPanelMinSize);
             }
+
+            this.prevPanelElement.style.flexBasis = 'calc(' + newPrevPanelSize + '% - ' + (this.panels.length - 1) * this.gutterSize + 'px)';
+            this.nextPanelElement.style.flexBasis = 'calc(' + newNextPanelSize + '% - ' + (this.panels.length - 1) * this.gutterSize + 'px)';
+            this.panelSizes[this.prevPanelIndex] = newPrevPanelSize;
+            this.panelSizes[this.prevPanelIndex + 1] = newNextPanelSize;
+            this.prevSize = parseFloat(newPrevPanelSize).toFixed(4);
 
             this.$emit('resize', { originalEvent: event, sizes: this.panelSizes });
         },
@@ -275,15 +278,11 @@ export default {
             if (newPrevPanelSize > 100 || newPrevPanelSize < 0) return false;
             if (newNextPanelSize > 100 || newNextPanelSize < 0) return false;
 
-            let prevPanelMinSize = getVNodeProp(this.panels[this.prevPanelIndex], 'minSize');
-
-            if (this.panels[this.prevPanelIndex].props && prevPanelMinSize && prevPanelMinSize > newPrevPanelSize) {
+            if (this.prevPanelMinSize > newPrevPanelSize) {
                 return false;
             }
 
-            let newPanelMinSize = getVNodeProp(this.panels[this.prevPanelIndex + 1], 'minSize');
-
-            if (this.panels[this.prevPanelIndex + 1].props && newPanelMinSize && newPanelMinSize > newNextPanelSize) {
+            if (this.nextPanelMinSize > newNextPanelSize) {
                 return false;
             }
 
@@ -394,6 +393,24 @@ export default {
                     nested: this.$parentInstance?.nestedState
                 }
             };
+        },
+        prevPanelMinSize() {
+            const prevPanelMinSize = getVNodeProp(this.panels[this.prevPanelIndex], 'minSize');
+
+            if (this.panels[this.prevPanelIndex].props && prevPanelMinSize) {
+                return prevPanelMinSize;
+            }
+
+            return 0;
+        },
+        nextPanelMinSize() {
+            const nextPanelMinSize = getVNodeProp(this.panels[this.prevPanelIndex + 1], 'minSize');
+
+            if (this.panels[this.prevPanelIndex + 1].props && nextPanelMinSize) {
+                return nextPanelMinSize;
+            }
+
+            return 0;
         }
     }
 };

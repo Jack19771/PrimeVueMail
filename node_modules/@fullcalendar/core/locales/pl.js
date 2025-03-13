@@ -1,26 +1,23 @@
-'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var pl = {
-  code: 'pl',
-  week: {
-    dow: 1, // Monday is the first day of the week.
-    doy: 4, // The week that contains Jan 4th is the first week of the year.
-  },
-  buttonText: {
-    prev: 'Poprzedni',
-    next: 'Następny',
-    today: 'Dziś',
-    month: 'Miesiąc',
-    week: 'Tydzień',
-    day: 'Dzień',
-    list: 'Plan dnia',
-  },
-  weekText: 'Tydz',
-  allDayText: 'Cały dzień',
-  moreLinkText: 'więcej',
-  noEventsText: 'Brak wydarzeń do wyświetlenia',
+var l56 = {
+    code: 'pl',
+    week: {
+        dow: 1,
+        doy: 4, // The week that contains Jan 4th is the first week of the year.
+    },
+    buttonText: {
+        prev: 'Poprzedni',
+        next: 'Następny',
+        today: 'Dziś',
+        year: 'Rok',
+        month: 'Miesiąc',
+        week: 'Tydzień',
+        day: 'Dzień',
+        list: 'Plan dnia',
+    },
+    weekText: 'Tydz',
+    allDayText: 'Cały dzień',
+    moreLinkText: 'więcej',
+    noEventsText: 'Brak wydarzeń do wyświetlenia',
 };
 
-exports.default = pl;
+export { l56 as default };

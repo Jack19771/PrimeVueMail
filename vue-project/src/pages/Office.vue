@@ -20,7 +20,7 @@ import Navi from '../components/Navi.vue';  // Zaimportuj komponent Navi
 import AIChat from '@/components/AIChat.vue';
 import Footer from '@/components/Footer.vue';
 import MapComponent from '@/components/MapComponent.vue';
-
+import BrowserComponent from '@/components/BrowserComponent.vue';
 
 
 
@@ -47,7 +47,8 @@ onMounted(() => {
             <!-- TabView do wyświetlania zakładek -->
             <TabView>
                 <TabPanel header="News and Updates">
-                    <AboutUs />
+                    
+                    <BrowserComponent url="http://example.com" />
                 </TabPanel>
                 <TabPanel header="Our Documents">
                     <Documentlibrary />

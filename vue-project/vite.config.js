@@ -12,6 +12,11 @@ export default defineConfig({
     vueDevTools(),
     tailwindcss()
   ],
+  server: {
+    host: "::", // Obsługa IPv6 i IPv4
+    port: 8081, // Port aplikacji frontendowej
+    strictPort: true, // Gwarantuje, że Vite użyje tego konkretnego portu
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

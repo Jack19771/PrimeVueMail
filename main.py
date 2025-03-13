@@ -21,6 +21,46 @@ active_connections = []
 # Globalny stan alertu
 alert_state = {"alert": None}
 
+
+
+# Kademlia
+swarm_process = None  # Proces Kademlia
+
+
+@app.post("/start-swarm")
+async def start_swarm():
+    global swarm_process
+    if swarm_process is None:
+        swarm_process = subprocess.Popen(["python", "Kademlia.py"])  # Uruchamiamy Kademlia
+        return {"message": "Swarm started on port 8468"}
+    else:
+        return {"message": "Swarm is already running."}
+
+
+@app.post("/stop-swarm")
+async def stop_swarm():
+    global swarm_process
+    if swarm_process:
+        swarm_process.terminate()
+        swarm_process = None
+        return {"message": "Swarm stopped."}
+    return {"message": "No swarm running."}
+
+
+@app.post("/connect-swarm")
+async def connect_swarm(ip: str):
+    try:
+        subprocess.Popen(["python", "Kademlia.py", "-i", ip, "-p", "8468"])  # Dołącz do sieci Kademlia
+        return {"message": f"Connected to swarm at {ip}:8468"}
+    except Exception as e:
+        return {"message": f"Error: {str(e)}"}
+
+
+
+
+
+
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     try:
@@ -78,13 +118,23 @@ async def get_alert_status():
     # Zwróć aktualny status alertu
     return {"alert": alert_state["alert"]}
 
+import subprocess
+
 def call_set_script(bootstrap_node, bootstrap_port, key, value):
-    # Używamy subprocess do wywołania set.py z odpowiednimi argumentami
     try:
-        subprocess.run(['python', 'set.py', bootstrap_node, str(bootstrap_port), key, value], check=True)
-        print("Dane zostały pomyślnie wstawione do Kademlia.")
+        print(f"🚀 Uruchamiam set.py z parametrami: {bootstrap_node} {bootstrap_port} {key} {value}")
+        result = subprocess.run(
+            ['python', 'set.py', bootstrap_node, str(bootstrap_port), key, value], 
+            check=True, capture_output=True, text=True
+        )
+        print("✅ Dane zostały pomyślnie wstawione do Kademlia.")
+        print("📜 STDOUT:", result.stdout)
+        print("⚠️ STDERR:", result.stderr)
     except subprocess.CalledProcessError as e:
-        print(f"Błąd podczas wywoływania set.py: {e}")
+        print(f"❌ Błąd podczas wywoływania set.py: {e}")
+        print("⚠️ STDERR:", e.stderr)
+
+
 
 # Dodanie CORS middleware
 app.add_middleware(
@@ -198,7 +248,7 @@ async def send_mail(email: EmailMessage):
         encrypted_filename = f"messages/encrypted_{email.subject.replace(' ', '_')}_{email.recipient}.txt"  # Używamy .txt dla ASCII
         with open(encrypted_filename, 'w') as enc_file:
             enc_file.write(encrypted_message)  # Zapisujemy zaszyfrowaną wiadomość w Base64 jako tekst
-            call_set_script('51.12.244.193', 8468, 'email', 'Jacek')
+            call_set_script("kademlia-bootstrap", "8468", "mail", "Jacek")  # Wywołanie skryptu set.py
             #
         # Wczytanie klucza prywatnego i podpisywanie wiadomości
         with open('keys/private_key.pem', 'rb') as priv_file:
